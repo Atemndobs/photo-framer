@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy</title>
+  <link rel="icon" type="image/png" href="icons8-web-camera-96.png">
+  <style>
+    :root {
+      --bg-color: #f4f4f9;
+      --text-color: #333;
+      --header-bg: #252525;
+      --header-text: #fff;
+      --button-bg: #252525;
+      --button-text: #fafafa;
+      --button-border: #fafafa;
+      --button-shadow: #fafafa;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #1a1a1a;
+      --text-color: #f0f0f0;
+      --header-bg: #333;
+      --header-text: #fff;
+      --button-bg: #444;
+      --button-text: #f0f0f0;
+      --button-border: #f0f0f0;
+      --button-shadow: #f0f0f0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: var(--header-text);
+      background-color: var(--header-bg);
+      padding: 20px;
+      margin: -20px -20px 20px -20px;
+    }
+
+    button {
+      font-size: 1rem;
+      color: var(--button-text);
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 2px solid var(--button-border);
+      background: var(--button-bg);
+      box-shadow: 3px 3px var(--button-shadow);
+      cursor: pointer;
+      margin: 20px 0;
+    }
+
+    button:active {
+      box-shadow: none;
+      transform: translate(3px, 3px);
+    }
+
+    .content {
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h1>Privacy Policy</h1>
+  <div class="content">
+    <p>This application respects your privacy. Here's how we handle your data:</p>
+    <ul>
+      <li>All image processing is done locally in your browser</li>
+      <li>We do not store or transmit any of your images</li>
+      <li>No personal data is collected or shared</li>
+      <li>You maintain full control over your images</li>
+    </ul>
+    <p>If you have any questions about our privacy practices, please contact us.</p>
+  </div>
+  <button onclick="window.location.href='index.html'">Back to Home</button>
+</body>
+</html>
