@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Upload</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #photoInput {
+      display: block;
+    }
+    #photoInput.hidden {
+      display: none;
+    }
+    #photoDisplay {
+      display: none;
+      max-width: 100%;
+      max-height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <input type="file" id="photoInput" accept="image/*" aria-label="Upload photo">
+    <img id="photoDisplay" alt="Selected Photo">
+  </main>
+  <script>
+    const photoInput = document.getElementById('photoInput');
+    const photoDisplay = document.getElementById('photoDisplay');
+
+    photoInput.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          photoDisplay.src = e.target.result; 
+          photoDisplay.style.display = 'block';
+          photoInput.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+</body>
+</html>

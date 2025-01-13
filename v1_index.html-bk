@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resizable Circular Frame with Cropping, Zoom, and Download</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    header {
+      padding: 20px;
+      background-color: #0078d7;
+      color: #fff;
+    }
+    main {
+      padding: 20px;
+    }
+    input[type="file"] {
+      margin: 20px 0;
+    }
+    .container {
+      position: relative;
+      display: inline-block;
+      margin-top: 20px;
+    }
+    .frame {
+      position: relative;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: grab;
+    }
+    .frame img {
+      position: absolute;
+      object-fit: cover;
+      cursor: grab;
+      transform-origin: center center;
+    }
+    #controls {
+      margin-top: 20px;
+    }
+    #controls label, #controls input {
+      margin: 5px;
+    }
+    #downloadButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #downloadButton:hover {
+      background-color: #005bb5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Resizable Circular Frame with Cropping, Zoom, and Download</h1>
+  </header>
+  <main>
+    <p>Select a photo to upload:</p>
+    <input type="file" id="photoInput" accept="image/*" aria-label="Select a photo to upload">
+    <div class="container">
+      <div id="frame" class="frame" style="width: 200px; height: 200px; display: none; border: 2px solid rgba(255, 255, 255, 0.5);">
+        <img id="photoDisplay" alt="Uploaded Photo">
+      </div>
+    </div>
+    <div id="controls" style="display: none;">
+      <label for="frameSize">Frame Size:</label>
+      <input type="range" id="frameSize" min="100" max="500" value="200">
+      <label for="borderThickness">Border Thickness:</label>
+      <input type="range" id="borderThickness" min="0" max="20" value="2">
+      <label for="borderTransparency">Border Transparency:</label>
+      <input type="range" id="borderTransparency" min="0" max="1" step="0.1" value="0.5">
+      <label for="cropZoom">Crop Zoom:</label>
+      <input type="range" id="cropZoom" min="1" max="3" step="0.1" value="1">
+    </div>
+    <button id="previewButton" style="display: none;">View</button>
+    <button id="downloadButton" style="display: none;">Download as PNG</button>
+  </main>
+  <canvas id="canvas" style="display: none;"></canvas>
+  <script>
+    const photoInput = document.getElementById('photoInput');
+    const photoDisplay = document.getElementById('photoDisplay');
+    const frame = document.getElementById('frame');
+    const frameSizeInput = document.getElementById('frameSize');
+    const borderThicknessInput = document.getElementById('borderThickness');
+    const borderTransparencyInput = document.getElementById('borderTransparency');
+    const cropZoomInput = document.getElementById('cropZoom');
+    const controls = document.getElementById('controls');
+    const downloadButton = document.getElementById('downloadButton');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    let frameSize = 200;
+    let borderThickness = 2;
+    let borderTransparency = 0.5;
+    let zoomLevel = 1;
+    let isDragging = false;
+    let imgOffset = { x: 0, y: 0 };
+    let dragStart = { x: 0, y: 0 };
+
+    // Load and display the photo
+    photoInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          photoDisplay.src = e.target.result;
+          frame.style.display = 'flex';
+          controls.style.display = 'block';
+          downloadButton.style.display = 'block';
+
+          // Reset zoom level and offsets
+          zoomLevel = 1;
+          imgOffset = { x: 0, y: 0 };
+
+          // Adjust initial size of the image to fit the frame
+          photoDisplay.onload = () => {
+            const imgWidth = photoDisplay.naturalWidth;
+            const imgHeight = photoDisplay.naturalHeight;
+
+            const aspectRatio = imgWidth / imgHeight;
+            const frameAspectRatio = frameSize / frameSize;
+
+            if (aspectRatio > frameAspectRatio) {
+              // Image is wider than the frame
+              photoDisplay.style.width = `${frameSize}px`;
+              photoDisplay.style.height = 'auto';
+            } else {
+              // Image is taller or square
+              photoDisplay.style.height = `${frameSize}px`;
+              photoDisplay.style.width = 'auto';
+            }
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Adjust frame size
+    frameSizeInput.addEventListener('input', () => {
+      frameSize = frameSizeInput.value;
+      frame.style.width = `${frameSize}px`;
+      frame.style.height = `${frameSize}px`;
+
+      // Recalculate initial fit for the image
+      photoDisplay.onload();
+    });
+
+    // Adjust border thickness
+    borderThicknessInput.addEventListener('input', () => {
+      borderThickness = borderThicknessInput.value;
+      frame.style.borderWidth = `${borderThickness}px`;
+    });
+
+    // Adjust border transparency
+    borderTransparencyInput.addEventListener('input', () => {
+      borderTransparency = borderTransparencyInput.value;
+      frame.style.borderColor = `rgba(255, 255, 255, ${borderTransparency})`;
+    });
+
+    // Adjust crop zoom
+    cropZoomInput.addEventListener('input', () => {
+      zoomLevel = cropZoomInput.value;
+      photoDisplay.style.transform = `scale(${zoomLevel}) translate(${imgOffset.x}px, ${imgOffset.y}px)`;
+    });
+
+    // Drag and move the image within the frame
+    photoDisplay.addEventListener('mousedown', (event) => {
+      isDragging = true;
+      dragStart.x = event.clientX - imgOffset.x;
+      dragStart.y = event.clientY - imgOffset.y;
+      photoDisplay.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (event) => {
+      if (isDragging) {
+        imgOffset.x = event.clientX - dragStart.x;
+        imgOffset.y = event.clientY - dragStart.y;
+        photoDisplay.style.transform = `scale(${zoomLevel}) translate(${imgOffset.x}px, ${imgOffset.y}px)`;
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      photoDisplay.style.cursor = 'grab';
+    });
+
+    // Download the result as PNG
+    downloadButton.addEventListener('click', () => {
+      const size = parseInt(frameSize);
+      canvas.width = size;
+      canvas.height = size;
+
+      // Draw circular clip
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
+      ctx.closePath();
+      ctx.clip();
+
+      // Draw image inside the circle with cropping and zoom
+      const img = new Image();
+      img.src = photoDisplay.src;
+      img.onload = () => {
+        const imgWidth = img.width * zoomLevel;
+        const imgHeight = img.height * zoomLevel;
+        const imgX = -imgOffset.x * (img.width / photoDisplay.offsetWidth);
+        const imgY = -imgOffset.y * (img.height / photoDisplay.offsetHeight);
+        ctx.drawImage(img, imgX, imgY, imgWidth, imgHeight);
+
+        // Draw border
+        ctx.restore();
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, size / 2 - borderThickness / 2, 0, 2 * Math.PI);
+        ctx.lineWidth = borderThickness;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${borderTransparency})`;
+        ctx.stroke();
+
+    // Trigger download
+    const link = document.createElement('a');
+    link.download = 'circular-frame.png';
+    link.href = canvas.toDataURL();
+    link.click();
+      };
+    });
+
+    // View/Preview Button
+    const previewButton = document.getElementById('previewButton');
+
+    previewButton.addEventListener('click', () => {
+      const size = parseInt(frameSize);
+      canvas.width = size;
+      canvas.height = size;
+
+      // Draw circular clip
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
+      ctx.closePath();
+      ctx.clip();
+
+      // Draw image inside the circle with cropping and zoom
+      const img = new Image();
+      img.src = photoDisplay.src;
+      img.onload = () => {
+        const imgWidth = img.width * zoomLevel;
+        const imgHeight = img.height * zoomLevel;
+        const imgX = -imgOffset.x * (img.width / photoDisplay.offsetWidth);
+        const imgY = -imgOffset.y * (img.height / photoDisplay.offsetHeight);
+        ctx.drawImage(img, imgX, imgY, imgWidth, imgHeight);
+
+        // Draw border
+        ctx.restore();
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, size / 2 - borderThickness / 2, 0, 2 * Math.PI);
+        ctx.lineWidth = borderThickness;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${borderTransparency})`;
+        ctx.stroke();
+
+        // Save result as a Data URL to localStorage
+        const resultImageURL = canvas.toDataURL();
+        localStorage.setItem('croppedImage', resultImageURL);
+
+        // Open the second page
+        window.open('result.html', '_blank');
+      };
+    });
+
+    // Show the preview button when the image is loaded
+    photoInput.addEventListener('change', () => {
+      previewButton.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
