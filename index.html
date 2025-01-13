@@ -230,6 +230,7 @@
           frame.style.display = 'flex';
           controls.style.display = 'block';
           downloadButton.style.display = 'block';
+          document.getElementById('bmc-button-container').style.display = 'block';
 
           // Reset zoom level and offsets
           zoomLevel = 1;
@@ -350,5 +351,14 @@
       };
     });
   </script>
+  <div id="bmc-button-container" style="display: none; margin: 20px auto;">
+    <style>
+      #bmc-wbtn {
+        transform: scale(0.8);
+        transform-origin: center;
+      }
+    </style>
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="atemkeng" data-color="#BD5FFF" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
+  </div>
 </body>
 </html>
