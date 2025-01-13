@@ -6,80 +6,153 @@
   <title>Resizable Circular Frame with Cropping, Zoom, and Download</title>
   <link rel="icon" type="image/png" href="icons8-web-camera-96.png">
   <style>
+    :root {
+      --bg-color: #f4f4f9;
+      --text-color: #333;
+      --header-bg: #252525;
+      --header-text: #fff;
+      --button-bg: #252525;
+      --button-text: #fafafa;
+      --button-border: #fafafa;
+      --button-shadow: #fafafa;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #1a1a1a;
+      --text-color: #f0f0f0;
+      --header-bg: #333;
+      --header-text: #fff;
+      --button-bg: #444;
+      --button-text: #f0f0f0;
+      --button-border: #f0f0f0;
+      --button-shadow: #f0f0f0;
+    }
+
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       margin: 0;
       padding: 0;
-      background-color: #f4f4f9;
-      color: #333;
+      background-color: var(--bg-color);
+      color: var(--text-color);
     }
+
     header {
       padding: 20px;
-      background-color: #0078d7;
-      color: #fff;
+      background-color: var(--header-bg);
+      color: var(--header-text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    main {
-      padding: 20px;
+
+    #themeToggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      margin: 0;
     }
+
+    #themeToggle img {
+      width: 24px;
+      height: 24px;
+      filter: invert(1);
+    }
+
+    button {
+      font-size: 1.5rem;
+      color: var(--button-text);
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 2px solid var(--button-border);
+      background: var(--button-bg);
+      box-shadow: 3px 3px var(--button-shadow);
+      cursor: pointer;
+      margin: 35px 0;
+    }
+
+    button:active {
+      box-shadow: none;
+      transform: translate(3px, 3px);
+    }
+
     input[type="file"] {
-      margin: 20px 0;
+      font-size: 1.5rem;
+      color: var(--button-text);
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 2px solid var(--button-border);
+      background: var(--button-bg);
+      box-shadow: 3px 3px var(--button-shadow);
+      cursor: pointer;
+      margin: 35px 0;
     }
+
+    input[type="file"]:active {
+      box-shadow: none;
+      transform: translate(3px, 3px);
+    }
+
     .container {
       position: relative;
       display: inline-block;
       margin-top: 20px;
     }
+
     .frame {
       position: relative;
       border-radius: 50%;
       overflow: hidden;
       cursor: grab;
     }
+
     .frame img {
       position: absolute;
       object-fit: cover;
       cursor: grab;
       transform-origin: center center;
     }
+
     #controls {
       margin-top: 20px;
     }
-    #controls label, #controls input {
+
+    #controls label,
+    #controls input {
       margin: 5px;
     }
+
     #downloadButton {
       margin: 20px auto;
-      padding: 10px 20px;
-      background-color: #0078d7;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
       display: block;
-    }
-    #downloadButton:hover {
-      background-color: #005bb5;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Resizable Circular Photo Frame </h1>
+    <h1>Resizable Circular Photo Frame</h1>
+    <button id="themeToggle" aria-label="Toggle theme">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJmZWF0aGVyIGZlYXRoZXItc3VuIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI1Ij48L2NpcmNsZT48bGluZSB4MT0iMTIiIHkxPSIxIiB4Mj0iMTIiIHkyPSIzIj48L2xpbmU+PGxpbmUgeDE9IjEyIiB5MT0iMjEiIHgyPSIxMiIgeTI9IjIzIj48L2xpbmU+PGxpbmUgeDE9IjQuMjIiIHkxPSI0LjIyIiB4Mj0iNS42NCIgeTI9IjUuNjQiPjwvbGluZT48bGluZSB4MT0iMTguMzYiIHkxPSIxOC4zNiIgeDI9IjE5Ljc4IiB5Mj0iMTkuNzgiPjwvbGluZT48bGluZSB4MT0iMSIgeTE9IjEyIiB4Mj0iMyIgeTI9IjEyIj48L2xpbmU+PGxpbmUgeDE9IjIxIiB5MT0iMTIiIHgyPSIyMyIgeTI9IjEyIj48L2xpbmU+PGxpbmUgeDE9IjQuMjIiIHkxPSIxOS43OCIgeDI9IjUuNjQiIHkyPSIxOC4zNiI+PC9saW5lPjxsaW5lIHgxPSIxOC4zNiIgeTE9IjUuNjQiIHgyPSIxOS43OCIgeTI9IjQuMjIiPjwvbGluZT48L3N2Zz4=" alt="">
+    </button>
   </header>
   <main>
-    <!-- <p>Select a photo to upload:</p> -->
-    <input type="file" id="photoInput" accept="image/*">
     <div class="container">
       <div id="frame" class="frame" style="width: 200px; height: 200px; display: none; border: 2px solid rgba(255, 255, 255, 0.5);">
         <img id="photoDisplay" alt="Uploaded Photo">
       </div>
     </div>
+    <div class="file-input-container">
+      <input type="file" id="photoInput" accept="image/*" aria-label="Select a photo to upload" style="display: none;">
+      <button id="customFileButton">Select Photo</button>
+    </div>
     <div id="controls" style="display: none;">
       <label for="frameSize">Frame Size:</label>
       <input type="range" id="frameSize" min="100" max="500" value="200">
       <label for="borderThickness">Border Thickness:</label>
-      <input type="range" id="borderThickness" min="0" max="50" value="2">
+      <input type="range" id="borderThickness" min="0" max="100" value="2">
       <label for="borderTransparency">Border Transparency:</label>
       <input type="range" id="borderTransparency" min="0" max="1" step="0.1" value="0.5">
       <label for="borderGradient">Border Gradient:</label>
@@ -91,9 +164,44 @@
   </main>
   <canvas id="canvas" style="display: none;"></canvas>
   <script>
+    // Theme management
+    const themeToggle = document.getElementById('themeToggle');
+    let currentTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    
+    // Update theme toggle icon based on current theme
+    const updateThemeIcon = () => {
+      const isDark = currentTheme === 'dark';
+      themeToggle.querySelector('img').style.transform = isDark ? 'rotate(180deg)' : 'rotate(0deg)';
+      themeToggle.querySelector('img').style.transition = 'transform 0.3s ease';
+    };
+    
+    // Initialize icon state
+    updateThemeIcon();
+
+    themeToggle.addEventListener('click', () => {
+      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.documentElement.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      localStorage.setItem('theme', currentTheme);
+      updateThemeIcon();
+      
+      // Smooth transition for buttons and inputs
+      document.querySelectorAll('button, input').forEach(el => {
+        el.style.transition = 'background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease';
+      });
+    });
+
     const photoInput = document.getElementById('photoInput');
     const photoDisplay = document.getElementById('photoDisplay');
     const frame = document.getElementById('frame');
+    const customFileButton = document.getElementById('customFileButton');
+
+    // Connect custom button to file input
+    customFileButton.addEventListener('click', () => {
+      photoInput.click();
+    });
+
     const frameSizeInput = document.getElementById('frameSize');
     const borderThicknessInput = document.getElementById('borderThickness');
     const borderTransparencyInput = document.getElementById('borderTransparency');
@@ -177,7 +285,6 @@
       const borderGradient = borderGradientInput.value;
       frame.style.borderImageSource = 'none';
       frame.style.borderColor = borderGradient;
-      frame.style.borderStyle = 'solid';
       frame.style.borderWidth = `${borderThickness}px`;
     });
 
