@@ -66,3 +66,14 @@ A web-based tool for creating circular profile pictures with customizable border
      python -m http.server 8000
      ```
      Then open http://localhost:8000 in your browser
+   - **Docker Deployment**:
+     ```bash
+     # Build and run the container
+     docker-compose up -d
+     
+     # Access the application at:
+     http://localhost:8080
+     
+     # To stop the container
+     docker-compose down
+     ```
