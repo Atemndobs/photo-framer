@@ -45,3 +45,24 @@ A web-based tool for creating circular profile pictures with customizable border
 
 - Modern web browser (Chrome, Firefox, Edge, Safari)
 - JavaScript enabled
+
+## How to Start
+
+1. Clone the repository:
+   ```bash
+   git clone git@github.com:Atemndobs/photo-framer.git
+   ```
+2. Open the project directory:
+   ```bash
+   cd photo-framer
+   ```
+3. Run the application using one of these methods:
+   - **Direct file access**:
+     ```bash
+     open index.html
+     ```
+   - **Python HTTP server**:
+     ```bash
+     python -m http.server 8000
+     ```
+     Then open http://localhost:8000 in your browser
